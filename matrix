@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# This script is to start matrix synapse server
+
+SHOW_LOGS=0
+ACTION="start"
+ROOT_PATH=$(pwd)
+
+function args() {
+  PARSED_ARGUMENTS=$(getopt -a -n alphabet -o sthl --long start,stop,help,logs -- "$@")
+  VALID_ARGUMENTS=$?
+  if [ "$VALID_ARGUMENTS" != "0" ]; then
+    usage
+  fi
+  eval set -- "$PARSED_ARGUMENTS"
+  while :
+  do
+    case "$1" in
+      -s | --start)
+        ACTION="start"
+        shift;
+      ;;
+      -t | --stop)
+        ACTION="stop"
+        shift;
+      ;;
+      -h | --help)
+        usage
+        exit 0
+        shift;
+      ;;
+      -l | --logs)
+        SHOW_LOGS=1
+        echo "Matrix logs activated, we are going to run docker on attach mode"
+        shift;
+      ;;
+      # -- means the end of the arguments; drop this, and break out of the while loop
+      --) shift; break ;;
+      # If invalid options were passed, then getopt should have reported an error,
+      # which we checked as VALID_ARGUMENTS when getopt was called...
+      *) echo "Unexpected option: $1 - this should not happen."
+         usage
+         exit 1
+    esac
+  done
+}
+
+function usage() {
+  echo "Usage:"
+  echo "$(pwd)/matrix or $(pwd)/matrix --start : to start synapse matrix server in de-attached mode (no logs). You can see logs by using: sudo docker-compose logs synapse."
+  echo "$(pwd)/matrix --stop : to stop matrix synapse server."
+  echo "$(pwd)/matrix --help : to show this message"
+}
+
+function startMatrix() {
+  echo "Trying to start Matrix"
+  cd "${ROOT_PATH}/reverse-proxy" || exit
+  sudo docker-compose up -d
+  cd "${ROOT_PATH}/synapse" || exit
+  if [ "${SHOW_LOGS}" == 1 ]; then
+    sudo docker-compose up
+    exitOnFailure $?
+  else
+    sudo docker-compose up -d
+    exitOnFailure $?
+    echo "Synapse is running"
+  fi
+}
+
+function exitOnFailure() {
+  if [ "$1" != 0 ]; then
+    exit 1
+  fi
+}
+
+function stopMatrix() {
+  echo "Trying to Stop Matrix"
+  cd "${ROOT_PATH}/reverse-proxy" || echo "Error trying to start reverse proxy" && exit
+  sudo docker-compose down
+  exitOnFailure $?
+  cd "${ROOT_PATH}/synapse" || echo "Error trying to start synapse" && exit
+  sudo docker-compose down
+  exitOnFailure $?
+}
+
+args "$0" "$@"
+
+if [ "${ACTION}" == "start" ]; then
+  startMatrix
+elif [ "${ACTION}" == "stop" ]; then
+  stopMatrix
+fi
+
+exit 0
