@@ -75,10 +75,10 @@ function exitOnFailure() {
 
 function stopMatrix() {
   echo "Trying to Stop Matrix"
-  cd "${ROOT_PATH}/reverse-proxy" || echo "Error trying to start reverse proxy" && exit
+  cd "${ROOT_PATH}/reverse-proxy" || exit
   sudo docker-compose down
   exitOnFailure $?
-  cd "${ROOT_PATH}/synapse" || echo "Error trying to start synapse" && exit
+  cd "${ROOT_PATH}/synapse" || exit
   sudo docker-compose down
   exitOnFailure $?
 }

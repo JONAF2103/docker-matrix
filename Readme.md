@@ -47,12 +47,22 @@ chown -R $USER synapse
 chmod -R a+rw synapse
 ```
 
-The last step is to generate synapse data folder like this:
+NOTE: If you need to modify these files later you can have problems because docker changes the permissions again, if
+you have troubles by editing the data directory you can run `sudo chmod -R a+rw synapse` and you will have ability to 
+edit those files again.
+
+Now generate synapse data folder like this:
 
 ```
 cd synapse
 sudo docker-compose run --rm synapse generate
 ```
 
-Finally you can go back to root folder and use the `matrix` script to start the server.
+After having the `synapse/data` folder generated, you will need to edit the file `synapse/data/homeserver.yaml` 
+to enable the option enable_registration. To do it you have to uncomment the line `enable_registration: false`
+and change it to `enable_registration: true`.
 
+The last step is to go back to root folder and use the `matrix` script to start the server.
+
+### Source
+This repository is based on [this](https://linuxhandbook.com/install-matrix-synapse-docker/) post.
