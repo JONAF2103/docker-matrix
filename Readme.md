@@ -7,7 +7,7 @@ without having to do hard configuration steps.
 ## Pre Requisites
 
 - Docker Installed
-- Docker Compose Installed
+- Docker Compose Installed (docker-compose version 1.8.0+)
 
 ## How to use it
 
