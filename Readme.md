@@ -64,5 +64,9 @@ and change it to `enable_registration: true`.
 
 The last step is to go back to root folder and use the `matrix` script to start the server.
 
+**Important Note:** if after doing all the steps you have problems to login on matrix or register that's because the 
+docker volume doesn't have right permissions, to fix this you have to run again `sudo chmod -R a+rw synapse` on the root
+folder.
+
 ### Source
 This repository is based on [this](https://linuxhandbook.com/install-matrix-synapse-docker/) post.
